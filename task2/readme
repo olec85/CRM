@@ -1,0 +1,94 @@
+## Задание 1
+
+Напишите реализацию наиболее точного таймера.
+
+Шаг анимации таймера 1 секунда.
+
+Форматирование таймера “hh:mm:ss”.
+
+Например 01:12:59 - один час, 12 минут, 59 секунд.
+
+
+
+const inputEl = document.querySelector('input');
+const buttonEl = document.querySelector('button');
+const timerEl = document.querySelector('span');
+
+// Напишите реализацию createTimerAnimator
+// который будет анимировать timerEl
+const createTimerAnimator = () => {
+  return (seconds) => {
+    // // Возвращают TimeStamp
+    // // console.log(new Date().getTime());
+    // // console.log(Number(new Date()));
+    // // console.log(Date.now() + seconds);
+    let StartTimer = new Date().getTime();
+    let EndTimer = StartTimer + seconds * 1000; // конец таймера
+
+    
+    let sec = seconds % 60;
+    let hours = Math.trunc(seconds / 3600);
+    let min = Math.trunc(seconds / 60) % 60; // или flor
+
+    console.log("Start:",StartTimer,hours, "hours", min, "min", sec, "sec");
+
+    // if (sec < 10) { secStr = `0${sec}` } else { secStr = "" + sec }
+    // if (hh < 10) { hhStr = `0${hh}` } else { hhStr = "" + hh }
+    // if (min < 10) { minStr = `0${min}` } else { minStr = "" + min }
+
+    // или 
+
+    function TimeStr(sec) {
+      let s = sec % 60;
+      let h = Math.trunc(sec / 3600);
+      let m = Math.trunc(sec / 60) % 60;
+      return [
+        h.toString().padStart(2, '0'),
+        m.toString().padStart(2, '0'),
+        s.toString().padStart(2, '0')
+      ].join(':');
+    }
+    // timerEl.textContent = `${hhStr}:${minStr}:${secStr}`
+    timerEl.textContent = `${TimeStr(hours, min, sec)}`
+
+
+    let t = seconds;
+
+    let interval = setInterval(() => {
+      if(Math.trunc((EndTimer - Date.now())/1000) < t){
+        t = Math.trunc((EndTimer - Date.now())/1000);
+        timerEl.textContent = `${TimeStr(Math.trunc((EndTimer - Date.now()) / 1000) + 1)}`
+        console.log(Date.now());
+      }
+
+      if (EndTimer <= Date.now()) {
+        timerEl.textContent = `${TimeStr(0, 0, 0)}`
+        clearInterval(interval);
+      }
+    }, 1)
+
+    buttonEl.addEventListener('click', () => {
+      if(interval){
+        clearInterval(interval);
+      }
+    });
+
+  };
+};
+
+const animateTimer = createTimerAnimator();
+
+inputEl.addEventListener('input', () => {
+  // Очистите input так, чтобы в значении
+  // оставались только числа
+  inputEl.value = inputEl.value.replace(/[^0-9]/g, "");
+});
+
+buttonEl.addEventListener('click', () => {
+  const seconds = Number(inputEl.value);
+
+  // if (seconds > 0) {
+    animateTimer(seconds);
+  // }
+  inputEl.value = '0';
+});
